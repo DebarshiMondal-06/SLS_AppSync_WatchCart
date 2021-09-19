@@ -7,7 +7,7 @@ plugins:
 provider:
   name: aws
   runtime: nodejs12.x
-  region: ap-south-1
+  region: ap-northeast-1
   lambdaHashingVersion: 20201221
 
 package:
@@ -93,6 +93,12 @@ custom:
         type: Mutation
         field: addUser
         request: "addUser-request.vtl"
+        response: "common-response.vtl"
+      
+      - dataSource: awsLambdaWatch_Fun
+        type: Mutation
+        field: addWatch
+        request: "addWatch-request.vtl"
         response: "common-response.vtl"
       
       - dataSource: awsLambdaCart_Fun
