@@ -19,6 +19,7 @@ package:
     - '!mapping-templates/**'
     - '!schema.graphql'
     - '!package.json'
+    - '!React_AppSync/**'
 
 
 functions:
@@ -113,7 +114,7 @@ appSync:
         - getCartFnPipeline
     
     getUserWatchCount:
-      type: Query
+      type: Mutation
       field: getUserWatchCount
       kind: UNIT
       dataSource: awsLambdaCarts_Fun
@@ -128,12 +129,30 @@ appSync:
       request: resolvers/unit/addWatch-request.vtl
       response: resolvers/unit/common-response.vtl
 
+    addUser:
+      type: Mutation
+      field: addUser
+      kind: UNIT
+      dataSource: userTable_DataSource
+      request: resolvers/unit/addUser-request.vtl
+      response: resolvers/unit/common-response.vtl
+
+    getUser:
+      type: Mutation
+      field: getUser
+      kind: UNIT
+      dataSource: userTable_DataSource
+      request: resolvers/unit/getUser-request.vtl
+      response: resolvers/unit/common-response.vtl
+
     addCart:
       type: Mutation
       field: addCart
       functions:
         - getWatchFnPipeline
         - addToCartFnPipeline
+
+    
         
 
 
@@ -156,6 +175,12 @@ appSync:
       description: 'Amazon DynamoDB dataSource for cart table'
       config: 
         tableName: !Ref cartTable
+
+    userTable_DataSource:
+      type: AMAZON_DYNAMODB
+      description: 'Amazon DynamoDB dataSource for user table'
+      config: 
+        tableName: !Ref userTable
 
 
       
@@ -189,6 +214,19 @@ resources:
             AttributeType: "N"
         KeySchema:
           - AttributeName: "watch_id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 3
+          WriteCapacityUnits: 3
+    userTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: UserTable  
+        AttributeDefinitions:
+          - AttributeName: "email"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "email"
             KeyType: "HASH"
         ProvisionedThroughput:
           ReadCapacityUnits: 3

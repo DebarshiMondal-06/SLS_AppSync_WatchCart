@@ -1,3 +1,7 @@
+type User {
+	email: String
+}
+
 type Cart {
 	user_id: String
 	watch_id: Int
@@ -33,6 +37,9 @@ type Mutation {
 		description: String!
 	): Watch
 	addCart(user_id: String!, watch_id: Int!, count: Int!): Cart
+	addUser(email: String!): User
+	getUser(email: String!): User
+	getUserWatchCount(user_id: String!, watch_id: Int!): CartCount
 }
 
 type Query {
@@ -40,7 +47,6 @@ type Query {
 	getWatch(watch_id: Int!): Watch
 	getCarts(user_id: String!, watch_id: Int!): CartWatchData
 	getUserOrders(user_id: String!): CartItems
-	getUserWatchCount(user_id: String!, watch_id: Int!): CartCount
 }
 
 type Watch {
