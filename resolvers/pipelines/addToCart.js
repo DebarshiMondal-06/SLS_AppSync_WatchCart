@@ -1,9 +1,9 @@
 import { util } from '@aws-appsync/utils';
 
 export function request(ctx) {
-  const { price } = ctx.prev.result;
+  const { price, brand } = ctx.prev.result;
   const { watch_id, user_id, count } = ctx.arguments;
-  return dynamodbPutRequest({ key: { watch_id, user_id }, values: { count, price } });
+  return dynamodbPutRequest({ key: { watch_id, user_id }, values: { count, price, brand } });
 }
 
 export function response(ctx) {

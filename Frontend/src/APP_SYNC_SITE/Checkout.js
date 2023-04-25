@@ -22,10 +22,10 @@ const Checkout = () => {
               <p>Items</p>
               {
                 carts && carts.map((ele, i) => {
-                  const {  watch_id, price } = ele || {};
+                  const { price, brand } = ele || {};
                   // const { name, brand } = watch || {};
                   return <section key={i} className="items_qunatity">
-                    <article className="brand_name text-capitalize"><b></b> #{watch_id}</article>
+                    <article className="brand_name text-capitalize"><b></b> {brand} </article>
                     <article className="cart_price"><b></b> ${price}/-</article>
                     <p className="line"></p>
                   </section>
@@ -35,9 +35,9 @@ const Checkout = () => {
             <div className="col-md-4 quanties">
               <p>Quantity</p>
               {
-                carts && carts.map((ele) => {
+                carts && carts.map((ele, i) => {
                   const { count } = ele || {};
-                  return <section className="items_qunatity">
+                  return <section key={i} className="items_qunatity">
                     <article className="count">{count}</article>
                   </section>
                 })
@@ -46,7 +46,7 @@ const Checkout = () => {
                 <span className="total_num">${
                   carts && carts.reduce((acc, curr) => acc + (curr.price * curr.count), 0)
                 }</span>
-                </h2>
+              </h2>
             </div>
             <div className="col-md-2"></div>
           </section>

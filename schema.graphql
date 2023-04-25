@@ -6,7 +6,8 @@ type Cart {
 	user_id: String
 	watch_id: Int
 	count: Int
-	price: Int
+	price: Int,
+	brand: String
 }
 
 type CartCount {

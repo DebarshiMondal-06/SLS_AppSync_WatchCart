@@ -39,7 +39,8 @@ query loadUserCart($user_id: String!){
     carts {
       count
       price
-      watch_id
+      watch_id,
+      brand
     }
   }
 }`;

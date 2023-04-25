@@ -10,9 +10,6 @@ export function response(ctx) {
   return ctx.result;
 }
 
-/**
- * A helper function to get a DynamoDB item
- */
 function dynamoDBGetItemRequest(key) {
   return {
     operation: 'GetItem',
