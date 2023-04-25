@@ -1,0 +1,11 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "index" : "category-index",
+    "query" : {
+      "expression": "category = :category",
+      "expressionValues" : {
+        ":category" : $util.dynamodb.toDynamoDBJson($ctx.args.category)
+      }
+    }
+}

@@ -1,7 +1,7 @@
 {
   #if($context.info.fieldName == "getUserOrders")
 	  "carts": $util.toJson($context.result.items)
-  #elseif($context.info.fieldName == "getWatches")
+  #elseif($context.info.fieldName == "getWatches" || $ctx.info.fieldName == "getWatchByCategory")
 	  "watches": $util.toJson($context.result.items)
   #end
 }

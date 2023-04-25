@@ -9,7 +9,7 @@ const filter_filed = async(value) => {
         return result.Item;
     } 
     else {
-        return 0;
+        return null;
     }
 };
 

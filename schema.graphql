@@ -46,6 +46,7 @@ type Mutation {
 type Query {
 	getWatches: WatchItems
 	getWatch(watch_id: Int!): Watch
+	getWatchByCategory(category: String!): WatchItems
 	getCarts(user_id: String!, watch_id: Int!): CartWatchData
 	getUserOrders(user_id: String!): CartItems
 }

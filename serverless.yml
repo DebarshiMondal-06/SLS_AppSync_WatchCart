@@ -10,7 +10,6 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: ap-northeast-1
-  lambdaHashingVersion: 20201221
 
 package:
   individually: true
@@ -90,6 +89,14 @@ appSync:
       dataSource: watchTable_DataSource
       request: resolvers/unit/getWatches-request.vtl
       response: resolvers/unit/modified-response.vtl
+
+    getWatchByCategory:
+      type: Query
+      field: getWatchByCategory
+      kind: UNIT
+      dataSource: watchTable_DataSource
+      request: resolvers/unit/getWatchByCategory-request.vtl
+      response: resolvers/unit/modified-response.vtl
             
     getWatch:
       type: Query
@@ -111,6 +118,7 @@ appSync:
       type: Query
       field: getCarts
       functions:
+        - getWatchFnPipeline
         - getCartFnPipeline
     
     getUserWatchCount:
@@ -205,19 +213,33 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 3
           WriteCapacityUnits: 3
+
     watchTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
         TableName: WatchTable  
-        AttributeDefinitions:
-          - AttributeName: "watch_id"
-            AttributeType: "N"
-        KeySchema:
-          - AttributeName: "watch_id"
-            KeyType: "HASH"
         ProvisionedThroughput:
           ReadCapacityUnits: 3
           WriteCapacityUnits: 3
+        AttributeDefinitions:
+          - AttributeName: "watch_id"
+            AttributeType: "N"
+          - AttributeName: "category"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "watch_id"
+            KeyType: "HASH"
+        GlobalSecondaryIndexes:
+          - IndexName: category-index
+            KeySchema:
+              - AttributeName: category
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 3
+              WriteCapacityUnits: 3
+       
     userTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
