@@ -2,7 +2,7 @@ type Cart {
 	user_id: String
 	watch_id: Int
 	count: Int
-	watch: Watch
+	price: Int
 }
 
 type CartCount {
@@ -11,37 +11,36 @@ type CartCount {
 	count: Int
 }
 
+type CartItems {
+	carts: [Cart]
+}
+
+type CartWatchData {
+	user_id: String
+	watch_id: Int
+	count: Int
+	price: Int
+	watch_data: Watch
+}
+
 type Mutation {
 	addWatch(
+		watch_id: Int!,
 		name: String!,
 		brand: String!,
 		price: Int!,
 		category: String!,
 		description: String!
 	): Watch
-	addUser(email: String!): User
-	addCart(
-		user_id: String!,
-		watch_id: Int!,
-		count: Int!,
-		brand: String!,
-		price: Int!,
-		name: String!
-	): Cart
-	getUser(email: String!): User
-	getUserWatchCount(user_id: String!, watch_id: Int!): CartCount
+	addCart(user_id: String!, watch_id: Int!, count: Int!): Cart
 }
 
 type Query {
-	getWatches: [Watch]
+	getWatches: WatchItems
 	getWatch(watch_id: Int!): Watch
-	getUsers: [User]
-	getCarts(user_id: String!): [Cart]
-	getByCategory(category: String!): [Watch]
-}
-
-type User {
-	email: String
+	getCarts(user_id: String!, watch_id: Int!): CartWatchData
+	getUserOrders(user_id: String!): CartItems
+	getUserWatchCount(user_id: String!, watch_id: Int!): CartCount
 }
 
 type Watch {
@@ -51,6 +50,10 @@ type Watch {
 	category: String
 	price: Int
 	description: String
+}
+
+type WatchItems {
+	watches: [Watch]
 }
 
 schema {

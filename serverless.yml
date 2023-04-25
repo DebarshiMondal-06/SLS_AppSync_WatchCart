@@ -1,4 +1,6 @@
-service: sls-watch-graphql-01
+service: sls-watch-graphql-02
+
+frameworkVersion: '3'
 
 plugins:
    - serverless-appsync-plugin
@@ -35,7 +37,7 @@ functions:
           - dynamodb:PutItem
         Resource: 
           - !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/WatchTable
-          - { Fn::GetAtt: [userTable, Arn] }
+          - { Fn::GetAtt: [watchTable, Arn] }
   cartFun:
     name: cart_Function
     handler: cart_functions.handler
@@ -51,109 +53,116 @@ functions:
         Resource: 
           - !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/WatchTable
           - !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/WatchTable/index/*
+          - { Fn::GetAtt: [watchTable, Arn] }
+          - !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/Cart_Table
           - { Fn::GetAtt: [cartTable, Arn] }
     
 
+
+appSync:
+  name: SLS_AppSync_Watch_API
+  authentication: 
+    type: 'API_KEY'
+  apiKeys:
+    - name: SomeApiKey
+      description: 'My Api key'
+      expiresAfter: 30d
+
+
+  pipelineFunctions:
+    getCartFnPipeline:
+      dataSource: cartTable_DataSource
+      code: resolvers/pipelines/getCarts.js
+    getWatchFnPipeline:
+      dataSource: watchTable_DataSource
+      code: resolvers/pipelines/getWatch.js
+    addToCartFnPipeline:
+      dataSource: cartTable_DataSource
+      code: resolvers/pipelines/addToCart.js
+
+
+  resolvers:
+    getWatches:
+      type: Query
+      field: getWatches
+      kind: UNIT
+      dataSource: watchTable_DataSource
+      request: resolvers/unit/getWatches-request.vtl
+      response: resolvers/unit/modified-response.vtl
+            
+    getWatch:
+      type: Query
+      field: getWatch
+      kind: UNIT
+      dataSource: watchTable_DataSource
+      request: resolvers/unit/getWatch-request.vtl
+      response: resolvers/unit/common-response.vtl
+
+    getUserOrders:
+      type: Query
+      field: getUserOrders
+      kind: UNIT
+      dataSource: cartTable_DataSource
+      request: resolvers/unit/getUserOrders-request.vtl
+      response: resolvers/unit/modified-response.vtl
+
+    getCarts:
+      type: Query
+      field: getCarts
+      functions:
+        - getCartFnPipeline
     
-custom:
-  accountId: ${AWS::AccountId}
-  appSync:
-    name: SLS_AppSync_Watch_API
-    authenticationType: API_KEY
-    apiKeys:
-      - name: SomeApiKey
-        description: 'My Api key'
-        expiresAfter: 30d
-    mappingTemplates:
-      - dataSource: awsLambdaWatch_Fun
-        type: Query
-        field: getWatches
-        request: "getWatches-request.vtl"
-        response: "common-response.vtl"
+    getUserWatchCount:
+      type: Query
+      field: getUserWatchCount
+      kind: UNIT
+      dataSource: awsLambdaCarts_Fun
+      request: resolvers/unit/getUserWatchCount-request.vtl
+      response: resolvers/unit/common-response.vtl
 
-      - dataSource: awsLambdaWatch_Fun
-        type: Query
-        field: getWatch
-        request: "getWatch-request.vtl"
-        response: "common-response.vtl"
-      
-      - dataSource: awsLambdaWatch_Fun
-        type: Query
-        field: getUsers
-        request: "getUsers-request.vtl"
-        response: "common-response.vtl"
-      
-      - dataSource: awsLambdaWatch_Fun
-        type: Mutation
-        field: getUser
-        request: "getUser-request.vtl"
-        response: "common-response.vtl"
-      
-      - dataSource: awsLambdaWatch_Fun
-        type: Mutation
-        field: addUser
-        request: "addUser-request.vtl"
-        response: "common-response.vtl"
-      
-      - dataSource: awsLambdaWatch_Fun
-        type: Mutation
-        field: addWatch
-        request: "addWatch-request.vtl"
-        response: "common-response.vtl"
-      
-      - dataSource: awsLambdaCart_Fun
-        type: Query
-        field: getByCategory
-        request: "getByCategory-request.vtl"
-        response: "common-response.vtl"
-      
-      - dataSource: awsLambdaCart_Fun
-        type: Query
-        field: getCarts
-        request: "getCarts-request.vtl"
-        response: "common-response.vtl"
-      
-      - dataSource: awsLambdaCart_Fun
-        type: Mutation
-        field: getUserWatchCount
-        request: "getUserWatchCount-request.vtl"
-        response: "common-response.vtl"
+    addWatch:
+      type: Mutation
+      field: addWatch
+      kind: UNIT
+      dataSource: watchTable_DataSource
+      request: resolvers/unit/addWatch-request.vtl
+      response: resolvers/unit/common-response.vtl
 
-      - dataSource: awsLambdaCart_Fun
-        type: Mutation
-        field: addCart
-        request: "addCart-request.vtl"
-        response: "common-response.vtl"
+    addCart:
+      type: Mutation
+      field: addCart
+      functions:
+        - getWatchFnPipeline
+        - addToCartFnPipeline
+        
+
+
       
-    dataSources:
-      - type: AWS_LAMBDA
-        name: awsLambdaWatch_Fun
-        description: 'Lambda DataSources'
-        config:
-          lambdaFunctionArn: { Fn::GetAtt: [WatchFunLambdaFunction, Arn] }
-      - type: AWS_LAMBDA
-        name: awsLambdaCart_Fun
-        description: 'Lambda DataSources'
-        config:
-          lambdaFunctionArn: { Fn::GetAtt: [CartFunLambdaFunction, Arn] }
+  dataSources:
+    awsLambdaCarts_Fun:
+      type: AWS_LAMBDA
+      description: 'Lambda DataSources'
+      config:
+        functionName: cartFun
+
+    watchTable_DataSource:
+      type: AMAZON_DYNAMODB
+      description: 'Amazon DynamoDB dataSource for watch table'
+      config: 
+        tableName: !Ref watchTable
+
+    cartTable_DataSource:
+      type: AMAZON_DYNAMODB
+      description: 'Amazon DynamoDB dataSource for cart table'
+      config: 
+        tableName: !Ref cartTable
+
+
       
 
 
 resources:
   Resources:
-    userTable:
-      Type: 'AWS::DynamoDB::Table'
-      Properties:
-        TableName: User_Table  
-        AttributeDefinitions:
-          - AttributeName: "email"
-            AttributeType: "S"
-        KeySchema:
-          - AttributeName: "email"
-            KeyType: "HASH"
-        ProvisionedThroughput:
-          ReadCapacityUnits: 3
-          WriteCapacityUnits: 3
     cartTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
@@ -168,6 +177,19 @@ resources:
             KeyType: "HASH"
           - AttributeName: "watch_id"
             KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 3
+          WriteCapacityUnits: 3
+    watchTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: WatchTable  
+        AttributeDefinitions:
+          - AttributeName: "watch_id"
+            AttributeType: "N"
+        KeySchema:
+          - AttributeName: "watch_id"
+            KeyType: "HASH"
         ProvisionedThroughput:
           ReadCapacityUnits: 3
           WriteCapacityUnits: 3

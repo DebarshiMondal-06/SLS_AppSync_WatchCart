@@ -1,0 +1,14 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "PutItem",
+    "key" : {
+        "watch_id" : $util.dynamodb.toDynamoDBJson($context.arguments.watch_id)
+    },
+    "attributeValues" : {
+        "name" : $util.dynamodb.toDynamoDBJson($context.arguments.name),
+        "brand" : $util.dynamodb.toDynamoDBJson($context.arguments.brand),
+        "price" : $util.dynamodb.toDynamoDBJson($context.arguments.price),
+        "description" : $util.dynamodb.toDynamoDBJson($context.arguments.description),
+        "category" : $util.dynamodb.toDynamoDBJson($context.arguments.category),
+    }
+}

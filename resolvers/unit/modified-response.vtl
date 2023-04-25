@@ -1,0 +1,7 @@
+{
+  #if($context.info.fieldName == "getUserOrders")
+	  "carts": $util.toJson($context.result.items)
+  #elseif($context.info.fieldName == "getWatches")
+	  "watches": $util.toJson($context.result.items)
+  #end
+}

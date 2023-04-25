@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "serverless-appsync-plugin": "^1.12.0",
+    "serverless-appsync-plugin": "^2.2.0",
     "serverless-iam-roles-per-function": "^3.2.0"
   }
 }
