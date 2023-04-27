@@ -1,6 +1,6 @@
 ### AWS AppSync Service created Using Serverless Framework.
 
-Live Project. you could checkout [here](debarshimondal.vercel.app).
+Live Project. you could checkout [here](https://debarshimondal.vercel.app).
 
 #### Follow these steps for deployment to your AWS.
 
