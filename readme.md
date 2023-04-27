@@ -2,7 +2,7 @@
 
 Live Project. you could checkout [here](https://debarshimondal.vercel.app).
 
-#### Follow these steps for deployment to your AWS.
+### Follow these steps for deployment to your AWS.
 
 ##### Step1:
 Clone the Repo with,
@@ -37,7 +37,7 @@ Deploy the resources defined on serverless.yml with,
 </small>
 
 
-#### Follow these steps run to the Frontend (Reactjs).
+### Follow these steps run to the Frontend (Reactjs).
 ##### Step1:
 Navigate to Frontend Folder and Install all the packages,
 ```
