@@ -21,7 +21,7 @@ const App = () => {
     headers: {
       'x-api-key': "da2-b45zqgan7nanjfblp6wqvigg3a"
     }
-  });
+  }); // replace with your GraphQL URI and API KEY
 
 
   return <BrowserRouter>
